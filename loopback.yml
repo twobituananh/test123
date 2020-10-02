@@ -1,0 +1,29 @@
+---
+- name: tao loopback
+  hosts: tuananh1
+  gther_facts: no
+
+  tasks:
+  	- name: Create Loopback
+  	  ios_13_interface:
+  	  	name: loopback {{item.name}}
+  	  	ipv4: 10.0.{{item.number}}.1/24
+  	  with_items:
+  	  	- {name:"0",number: 0}
+  	  	- {name:"1",number: 1}
+  	  	- {name:"2",number: 3}
+  	- name: Set Ethernet0/1 IPv4 address
+      ios_l3_interface:
+        name: Ethernet0/2
+        ipv4: 192.168.12.2/24
+    - name: no shut
+      ios_interface:
+        name: Ethernet0/2
+        state: present
+    - name: Show ip
+      ios_command:
+        commands:
+          - show ip int brief
+      register: show_ip
+
+    - debug: var=show_ip.stdout_lines 
